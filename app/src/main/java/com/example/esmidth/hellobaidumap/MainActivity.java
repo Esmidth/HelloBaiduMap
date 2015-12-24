@@ -9,6 +9,7 @@ import com.baidu.mapapi.map.MapView;
 public class MainActivity extends AppCompatActivity {
     MapView mapView = null;
 
+    /* TODO: Add Location Function to the App*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
