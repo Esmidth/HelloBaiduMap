@@ -2,18 +2,40 @@ package com.example.esmidth.hellobaidumap;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
+import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration;
+import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.model.LatLng;
 
 
 public class MainActivity extends AppCompatActivity {
-    MapView mapView = null;
+    //Loc
     public LocationClient locationClient = null;
-    public BDLocationListener mylistener = new MyLocationListener();
+    public MyLocationListener mylistener = new MyLocationListener();
+    BitmapDescriptor mCurrentMarker;
+    BDLocation bdLocation = null;
+    TextView textView = null;
+    MyLocationConfiguration.LocationMode mCurrentMode;
+
+    BaiduMap baiduMap;
+    MapView mapView = null;
+
+    //UI
+    boolean isFirstLoc = true;
+    Button requestLocButton;
+    RadioGroup.OnCheckedChangeListener radioButtonListener;
 
     /* TODO: Add Location Function to the App*/
 
@@ -21,34 +43,44 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
-        mapView = (MapView) findViewById(R.id.bmapView);
-        locationClient = new LocationClient(getApplicationContext());
-        locationClient.registerLocationListener(mylistener);
-        initLocation();
+        requestLocButton = (Button) findViewById(R.id.button1);
+        mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+        requestLocButton.setText("NORMAL");
 
-        locationClient.start();
+        final View.OnClickListener btnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (mCurrentMode) {
+                    case NORMAL:
+                        requestLocButton.setText("跟随");
+                        mCurrentMode = MyLocationConfiguration.LocationMode.FOLLOWING;
+                        baiduMap
+                                .setMyLocationConfigeration(new MyLocationConfiguration(
+                                        mCurrentMode, true, mCurrentMarker));
+                        break;
+                    case COMPASS:
+                        requestLocButton.setText("普通");
+                        mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+                        baiduMap
+                                .setMyLocationConfigeration(new MyLocationConfiguration(
+                                        mCurrentMode, true, mCurrentMarker));
+                        break;
+                    case FOLLOWING:
+                        requestLocButton.setText("罗盘");
+                        mCurrentMode = MyLocationConfiguration.LocationMode.COMPASS;
+                        baiduMap
+                                .setMyLocationConfigeration(new MyLocationConfiguration(
+                                        mCurrentMode, true, mCurrentMarker));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        requestLocButton.setOnClickListener(btnClickListener);
 
-    }
-
-
-    private void initLocation() {
-        LocationClientOption option = new LocationClientOption();
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy
-        );//可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
-        option.setCoorType("bd09ll");//可选，默认gcj02，设置返回的定位结果坐标系
-        int span = 1000;
-        option.setScanSpan(span);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
-        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
-        option.setOpenGps(true);//可选，默认false,设置是否使用gps
-        option.setLocationNotify(true);//可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
-        option.setIsNeedLocationDescribe(true);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
-        option.setIsNeedLocationPoiList(true);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
-        option.setIgnoreKillProcess(false);//可选，默认false，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认杀死
-        option.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
-        option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤gps仿真结果，默认需要
-        locationClient.setLocOption(option);
+        RadioGroup group = (RadioGroup) this.findViewById(R.id.radioGroup)
     }
 
 
@@ -66,7 +98,32 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        locationClient.stop();
+        baiduMap.setMyLocationEnabled(false);
         mapView.onDestroy();
+        mapView = null;
+        super.onDestroy();
+    }
+
+
+    public class MyLocationListener implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            if (location == null || mapView == null) {
+                return;
+            }
+            MyLocationData locData = new MyLocationData.Builder().accuracy(location.getRadius()).direction(100).latitude(location.getLatitude()).longitude(location.getLongitude()).build();
+            baiduMap.setMyLocationData(locData);
+            if (isFirstLoc) {
+                isFirstLoc = false;
+                LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+                MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ll);
+                baiduMap.animateMapStatus(u);
+            }
+        }
+
+        public void onReceivePoi(BDLocation poiLocatioin) {
+        }
     }
 }

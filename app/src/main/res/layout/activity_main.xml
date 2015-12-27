@@ -7,10 +7,45 @@
     android:fitsSystemWindows="true"
     tools:context="com.example.esmidth.hellobaidumap.MainActivity">
 
-    <com.baidu.mapapi.map.MapView
-        android:id="@+id/bmapView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:clickable="true"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/bmapView"
+            android:layout_width="170dp"
+            android:layout_height="fill_parent"
+            android:clickable="true" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/Longitude"
+                android:layout_width="102dp"
+                android:layout_height="fill_parent"
+                android:clickable="false"
+                android:text="@string/LocationLongitude" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Button"
+                android:id="@+id/button1"
+                android:layout_gravity="bottom" />
+
+            <TextView
+                android:id="@+id/Latitude"
+                android:layout_width="fill_parent"
+                android:layout_height="191dp"
+                android:clickable="false"
+                android:text="@string/LocationLatitude" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
 
 </android.support.design.widget.CoordinatorLayout>

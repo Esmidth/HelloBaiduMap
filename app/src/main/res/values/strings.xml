@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">HelloBaiduMap</string>
     <string name="action_settings">Settings</string>
+    <string name="LocationAltitude">192</string>
+    <string name="LocationLongitude">OriLongitude</string>
+    <string name="LocationLatitude">OriLatitude</string>
 </resources>
