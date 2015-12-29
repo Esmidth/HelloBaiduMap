@@ -10,8 +10,11 @@ import android.widget.TextView;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
         requestLocButton = (Button) findViewById(R.id.button1);
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
@@ -80,7 +84,34 @@ public class MainActivity extends AppCompatActivity {
         };
         requestLocButton.setOnClickListener(btnClickListener);
 
-        RadioGroup group = (RadioGroup) this.findViewById(R.id.radioGroup)
+        RadioGroup group = (RadioGroup) this.findViewById(R.id.radioGroup);
+        radioButtonListener = new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.defaulticon) {
+                    mCurrentMarker = null;
+                    baiduMap.setMyLocationConfigeration(new MyLocationConfiguration(mCurrentMode, true, null));
+                }
+                if (checkedId == R.id.customicon) {
+                    mCurrentMarker = BitmapDescriptorFactory.fromResource(R.drawable.icon_geo);
+                    baiduMap.setMyLocationConfigeration(new MyLocationConfiguration(mCurrentMode, true, mCurrentMarker));
+                }
+            }
+        };
+        group.setOnCheckedChangeListener(radioButtonListener);
+
+        //Initalize the MapView
+        mapView = (MapView) findViewById(R.id.bmapView);
+        baiduMap = mapView.getMap();
+        baiduMap.setMyLocationEnabled(true);
+        locationClient = new LocationClient(this);
+        locationClient.registerLocationListener(mylistener);
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(true);
+        option.setCoorType("bd09ll");
+        option.setScanSpan(1000);
+        locationClient.setLocOption(option);
+        locationClient.start();
     }
 
 

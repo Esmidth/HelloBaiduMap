@@ -42,6 +42,26 @@
                 android:layout_height="191dp"
                 android:clickable="false"
                 android:text="@string/LocationLatitude" />
+
+            <RadioGroup
+                android:id="@+id/radioGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="定位icon">
+
+                <RadioButton
+                    android:id="@+id/defaulticon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="默认图标"></RadioButton>
+
+                <RadioButton
+                    android:id="@+id/customicon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="自定义图标"></RadioButton>
+            </RadioGroup>
         </LinearLayout>
 
 
