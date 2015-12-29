@@ -145,6 +145,11 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             MyLocationData locData = new MyLocationData.Builder().accuracy(location.getRadius()).direction(100).latitude(location.getLatitude()).longitude(location.getLongitude()).build();
+            textView = (TextView) findViewById(R.id.Latitude);
+            textView.setText(Double.toString(locData.latitude));
+            textView = (TextView) findViewById(R.id.Longitude);
+            textView.setText(Double.toString(location.getLongitude()));
+            textView = null;
             baiduMap.setMyLocationData(locData);
             if (isFirstLoc) {
                 isFirstLoc = false;
@@ -155,6 +160,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void onReceivePoi(BDLocation poiLocatioin) {
+            if (poiLocatioin == null || mapView == null)
+                return;
+            textView = (TextView) findViewById(R.id.Longitude);
+            textView.setText(Double.toString(poiLocatioin.getLongitude()));
+            textView = (TextView) findViewById(R.id.Latitude);
+            textView.setText(Double.toString(poiLocatioin.getLatitude()));
+            textView = null;
         }
     }
 }
