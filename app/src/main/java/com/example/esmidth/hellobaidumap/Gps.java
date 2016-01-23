@@ -1,11 +1,14 @@
 package com.example.esmidth.hellobaidumap;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.location.Criteria;
+import android.support.v4.app.ActivityCompat;
 
 
 /**
@@ -25,6 +28,16 @@ public class Gps {
         context = ctx;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         location = locationManager.getLastKnownLocation(getProvider());
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
     }
 
@@ -42,7 +55,7 @@ public class Gps {
         @Override
         public void onLocationChanged(Location locatioln) {
             if (locatioln != null)
-                locatioln = locatioln;
+                location = locatioln;
 
         }
 
@@ -53,6 +66,16 @@ public class Gps {
 
         @Override
         public void onProviderEnabled(String provider) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             Location l = locationManager.getLastKnownLocation(provider);
             if (l != null)
                 location = l;

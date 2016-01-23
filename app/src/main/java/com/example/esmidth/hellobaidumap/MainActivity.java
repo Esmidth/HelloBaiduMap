@@ -3,12 +3,16 @@ package com.example.esmidth.hellobaidumap;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -28,6 +32,7 @@ import com.baidu.mapapi.model.LatLng;
 
 public class MainActivity extends AppCompatActivity {
     //Loc
+    String TAG = "123";
     public LocationClient locationClient = null;
     public MyLocationListener mylistener = new MyLocationListener();
     BitmapDescriptor mCurrentMarker;
@@ -52,8 +57,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SDKInitializer.initialize(getApplicationContext());
-
         setContentView(R.layout.activity_main);
+
+        Log.i(TAG, UtilTool.isGpsEnabled((LocationManager) getSystemService(Context.LOCATION_SERVICE)) + "");
+        if (!UtilTool.isGpsEnabled((LocationManager) getSystemService(Context.LOCATION_SERVICE))) {
+            Toast.makeText(this, "GSP当前无法使用", Toast.LENGTH_LONG).show();
+            Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(callGPSSettingIntent);
+            return;
+        }
+        startService(new Intent(this, GpsService.class));
+        receiver = new MyReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("Great Esmidth");
+        registerReceiver(receiver, filter);
+
+
         requestLocButton = (Button) findViewById(R.id.button1);
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
         requestLocButton.setText("NORMAL");

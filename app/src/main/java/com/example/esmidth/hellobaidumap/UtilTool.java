@@ -77,8 +77,6 @@ public class UtilTool {
             return null;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
