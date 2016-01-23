@@ -1,5 +1,8 @@
 package com.example.esmidth.hellobaidumap;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -31,9 +34,11 @@ public class MainActivity extends AppCompatActivity {
     BDLocation bdLocation = null;
     TextView textView = null;
     MyLocationConfiguration.LocationMode mCurrentMode;
+    private MyReceiver receiver = null;
 
     BaiduMap baiduMap;
     MapView mapView = null;
+
 
     //UI
     boolean isFirstLoc = true;
@@ -47,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SDKInitializer.initialize(getApplicationContext());
+
         setContentView(R.layout.activity_main);
         requestLocButton = (Button) findViewById(R.id.button1);
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
@@ -62,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
                         baiduMap
                                 .setMyLocationConfigeration(new MyLocationConfiguration(
                                         mCurrentMode, true, mCurrentMarker));
+                        textView = (TextView) findViewById(R.id.Latitude);
+                        textView.setText("Latitude Test");
+                        textView = null;
+
                         break;
                     case COMPASS:
                         requestLocButton.setText("普通");
@@ -69,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
                         baiduMap
                                 .setMyLocationConfigeration(new MyLocationConfiguration(
                                         mCurrentMode, true, mCurrentMarker));
+                        textView = (TextView) findViewById(R.id.Latitude);
+                        textView.setText("FDFDFD");
+                        textView = null;
+
                         break;
                     case FOLLOWING:
                         requestLocButton.setText("罗盘");
@@ -129,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        unregisterReceiver(receiver);
+        stopService(new Intent(this, GpsService.class));
         locationClient.stop();
         baiduMap.setMyLocationEnabled(false);
         mapView.onDestroy();
@@ -167,6 +183,24 @@ public class MainActivity extends AppCompatActivity {
             textView = (TextView) findViewById(R.id.Latitude);
             textView.setText(Double.toString(poiLocatioin.getLatitude()));
             textView = null;
+        }
+    }
+
+    private class MyReceiver extends BroadcastReceiver {
+
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            String lon = bundle.getString("lon");
+            String lat = bundle.getString("lat");
+            if (lon != null && !"".equals(lon) && lat != null && !"".equals(lat)) {
+                textView = (TextView) findViewById(R.id.Latitude);
+                textView.setText("Lat: " + lat);
+                textView = (TextView) findViewById(R.id.Longitude);
+                textView.setText("Lon: " + lon);
+
+            }
         }
     }
 }
