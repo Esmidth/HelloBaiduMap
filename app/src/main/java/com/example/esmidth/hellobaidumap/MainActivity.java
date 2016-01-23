@@ -15,13 +15,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -34,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     //Loc
     String TAG = "123";
     public LocationClient locationClient = null;
-    public MyLocationListener mylistener = new MyLocationListener();
+//    public MyLocationListener mylistener = new MyLocationListener();
     BitmapDescriptor mCurrentMarker;
     BDLocation bdLocation = null;
     TextView textView = null;
@@ -117,28 +115,13 @@ public class MainActivity extends AppCompatActivity {
         };
         requestLocButton.setOnClickListener(btnClickListener);
 
-        RadioGroup group = (RadioGroup) this.findViewById(R.id.radioGroup);
-        radioButtonListener = new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.defaulticon) {
-                    mCurrentMarker = null;
-                    baiduMap.setMyLocationConfigeration(new MyLocationConfiguration(mCurrentMode, true, null));
-                }
-                if (checkedId == R.id.customicon) {
-                    mCurrentMarker = BitmapDescriptorFactory.fromResource(R.drawable.icon_geo);
-                    baiduMap.setMyLocationConfigeration(new MyLocationConfiguration(mCurrentMode, true, mCurrentMarker));
-                }
-            }
-        };
-        group.setOnCheckedChangeListener(radioButtonListener);
 
         //Initalize the MapView
         mapView = (MapView) findViewById(R.id.bmapView);
         baiduMap = mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
         locationClient = new LocationClient(this);
-        locationClient.registerLocationListener(mylistener);
+        //locationClient.registerLocationListener(mylistener);
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);
         option.setCoorType("bd09ll");
@@ -171,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-
+/*
     public class MyLocationListener implements BDLocationListener {
 
         @Override
@@ -204,9 +187,8 @@ public class MainActivity extends AppCompatActivity {
             textView = null;
         }
     }
-
+*/
     private class MyReceiver extends BroadcastReceiver {
-
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -214,11 +196,21 @@ public class MainActivity extends AppCompatActivity {
             String lon = bundle.getString("lon");
             String lat = bundle.getString("lat");
             if (lon != null && !"".equals(lon) && lat != null && !"".equals(lat)) {
+                BDLocation location1 = new BDLocation();
+                location1.setLatitude(Double.valueOf(lat));
+                location1.setLongitude(Double.valueOf(lon));
+                location1.setRadius((float) 1.1123123);
+                location1.setDirection((float) 3.2);
+                MyLocationData locData = new MyLocationData.Builder().accuracy(location1.getRadius()).direction(100).latitude(location1.getLatitude()).longitude(location1.getLongitude()).build();
+                baiduMap.setMyLocationData(locData);
+                LatLng ll = new LatLng(location1.getLatitude(), location1.getLongitude());
+                MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ll);
+                baiduMap.animateMapStatus(u);
+
                 textView = (TextView) findViewById(R.id.Latitude);
                 textView.setText("Lat: " + lat);
                 textView = (TextView) findViewById(R.id.Longitude);
                 textView.setText("Lon: " + lon);
-
             }
         }
     }
