@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
@@ -135,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        System.out.println("H");
     }
 
     @Override
@@ -154,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-/*
     public class MyLocationListener implements BDLocationListener {
 
         @Override
@@ -187,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
             textView = null;
         }
     }
-*/
     private class MyReceiver extends BroadcastReceiver {
 
         @Override
